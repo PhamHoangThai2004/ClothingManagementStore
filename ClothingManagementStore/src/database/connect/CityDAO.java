@@ -5,9 +5,10 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import model.entity.Account;
 import model.entity.City;
 
-public class CityDAO implements AllDAO<City>, DAOSearchByID<City>{
+public class CityDAO implements DAOInterface<City>, DAOSearch<City>{
 
     public static CityDAO setOBJ() {
         return new CityDAO();
@@ -24,7 +25,6 @@ public class CityDAO implements AllDAO<City>, DAOSearchByID<City>{
             PreparedStatement ps = c.prepareStatement(sql);
             ps.setInt(1, t.getCityID());
             ps.setString(2, t.getCityName());
-            System.out.println(sql);
             ketQua = ps.executeUpdate();
             DBConnect.CloseConnect(c);
         } catch (SQLException e) {
@@ -44,7 +44,6 @@ public class CityDAO implements AllDAO<City>, DAOSearchByID<City>{
             
             PreparedStatement ps = c.prepareStatement(sql);
             ps.setInt(1, t.getCityID());
-            System.out.println(sql);
             ketQua = ps.executeUpdate();
             DBConnect.CloseConnect(c);
         } catch (SQLException e) {
@@ -66,7 +65,6 @@ public class CityDAO implements AllDAO<City>, DAOSearchByID<City>{
             PreparedStatement ps = c.prepareStatement(sql);
             ps.setString(1, t.getCityName());
             ps.setInt(2, t.getCityID());
-            System.out.println(sql);
             ketQua = ps.executeUpdate();
             DBConnect.CloseConnect(c);
         } catch (SQLException e) {
@@ -81,9 +79,9 @@ public class CityDAO implements AllDAO<City>, DAOSearchByID<City>{
         try {
             Connection c = DBConnect.GetConnect();         
             String sql = "SELECT * FROM City";
-            PreparedStatement pst = c.prepareStatement(sql);
+            PreparedStatement ps = c.prepareStatement(sql);
             
-            ResultSet rs = pst.executeQuery();         
+            ResultSet rs = ps.executeQuery();         
             while(rs.next()) {
                 int cityID = rs.getInt("CityID");
                 String cityName = rs.getString("CityName");
@@ -98,16 +96,16 @@ public class CityDAO implements AllDAO<City>, DAOSearchByID<City>{
     }
 
     @Override
-    public City SelectByID(City t) {
+    public City Select(City t) {
         City ketQua = null;
         try {
             Connection c = DBConnect.GetConnect();  
             String sql = """
                          SELECT * FROM City
-                         WHERE CityID=?""";          
-            PreparedStatement pst = c.prepareStatement(sql);
-            pst.setInt(1, t.getCityID());
-            ResultSet rs = pst.executeQuery();
+                         WHERE CityName=?""";          
+            PreparedStatement ps = c.prepareStatement(sql);
+            ps.setString(1, t.getCityName());
+            ResultSet rs = ps.executeQuery();
             
             while(rs.next()) {
                 int cityID = rs.getInt("CityID");
@@ -119,6 +117,11 @@ public class CityDAO implements AllDAO<City>, DAOSearchByID<City>{
             ex.printStackTrace();
         }
         return ketQua;
+    }
+
+    @Override
+    public ArrayList<Account> Selects(City t) {
+        return null;
     }
     
 }

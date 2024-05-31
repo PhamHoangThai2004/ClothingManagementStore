@@ -29,12 +29,12 @@ public class City {
     public void setCityName(String cityName) {
         this.cityName = cityName;
     }
-                          
+              
     public  static ArrayList<City> getDSTinh() {
         String[] arrTinh = {"An Giang",
                             "Bà Rịa-Vũng Tàu",
-                            "Bắc Giang",
-                            "Bắc Kạn",
+                            "Bắc Giang",                       
+                            "Bắc Kạn",           
                             "Bạc Liêu",
                             "Bắc Ninh",
                             "Bến Tre",

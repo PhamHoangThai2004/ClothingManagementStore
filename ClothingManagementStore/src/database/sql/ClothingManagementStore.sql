@@ -6,7 +6,7 @@ create table City(
 
 -- Tạo bảng Account
 create table Account(
-    UserID varchar(255) primary key not null,
+    UserName varchar(255) primary key not null,
     Password varchar(255) not null,
     CreationDate date not null,
     Location int not null,
@@ -26,17 +26,17 @@ create table Branch(
     BranchName varchar(255) not null,
     PhoneNumber char(10) not null,
     Email varchar(255) not null,
-    UserID varchar(255) not null
+    UserName varchar(255) not null
 );
 
 -- Thêm ràng buộc cho bảng Branch
 alter table Branch
-    add constraint B_fk_A foreign key (UserID)
-        references Account(UserID);
+    add constraint B_fk_A foreign key (UserName)
+        references Account(UserName);
 
 -- Tạo bảng Product
 create table Product(
-    ProductID char(10) primary key not null,
+    ProductID varchar(255) primary key not null,
     ProductName varchar(255) not null,
     Brand varchar(255),
     ProductImage blob, 
@@ -51,7 +51,7 @@ alter table Product
 
 -- Tạo bảng ProductOfBranch
 create table ProductOfBranch(
-    ProductID char(10) not null,
+    ProductID varchar(255) not null,
     BranchID int not null,
     Quantity int not null,
     EntryDate date
@@ -71,18 +71,37 @@ create table Customer(
     CustomerID int AUTO_INCREMENT primary key not null,
     CustomerName varchar(255),
     Avatar blob,
+    Gender bit,
+    DateOfBirth date,
     Address varchar(255),
     PhoneNumber char(10),
     Email varchar(255),
     TotalPoint int default 100,
-    UserID varchar(255) not null
+    UserName varchar(255) not null
 )AUTO_INCREMENT = 1000;
 
 -- Thêm ràng buộc cho bảng Customer
 alter table Customer
-    add constraint C_fk_A foreign key (UserID)
-        references Account(UserID),
+    add constraint C_fk_A foreign key (UserName)
+        references Account(UserName),
     add constraint C_TotalPoint check (TotalPoint >= 0);
+
+-- Tạo bảng Cart
+create table Cart(
+    ProductID varchar(255) not null,
+    CustomerID int not null,
+    BranchID int not null
+);
+
+-- Thêm ràng buộc cho bảng Cart
+alter table Cart
+    add constraint Ca_pk primary key (ProductID, CustomerID, BranchID),
+    add constraint Ca_fk_P foreign key (ProductID)
+        references Product(ProductID),
+    add constraint Ca_fk_C foreign key (CustomerID)
+        references Customer(CustomerID),
+    add constraint Ca_fk_B foreign key (BranchID)
+        references Branch(BranchID);
 
 -- Tạo bảng Voucher
 create table Voucher(
@@ -117,15 +136,12 @@ create table Orders(
     OrderID int AUTO_INCREMENT primary key not null,
     CreationDate date not null,
     Status bit not null,
-    BranchID int not null,
     CustomerID int,
     VoucherCode char(10)
 )AUTO_INCREMENT = 100;
 
 -- Thêm ràng buộc cho bảng Orders
 alter table Orders
-    add constraint O_fk_B foreign key (BranchID)
-        references Branch(BranchID),
     add constraint O_fk_C foreign key (CustomerID)
         references Customer(CustomerID),
     add constraint O_fk_V foreign key (VoucherCode)
@@ -133,28 +149,31 @@ alter table Orders
 
 -- Tạo bảng OrderDetail
 create table OrderDetail(
-    ProductID char(10) not null,
     OrderID int not null,
+    ProductID varchar(255) not null,
+    BranchID int not null,
     Quantity int not null
 );
 
 -- Thêm ràng buộc cho bảng OrderDetail
 alter table OrderDetail
-    add constraint OD_pk primary key (ProductID, OrderID),
+    add constraint OD_pk primary key (OrderID, ProductID, BranchID),
+    add constraint OD_fk_O foreign key (OrderID)
+        references Orders(OrderID),
     add constraint OD_fk_P foreign key (ProductID)
         references Product(ProductID),
-    add constraint OD_fk_Bi foreign key (OrderID)
-        references Orders(OrderID),
+    add constraint OD_fk_B foreign key (BranchID)
+        references Branch(BranchID),
     add constraint OD_Quantity check (Quantity > 0);
 
 -- Chèn dữ liệu vào bảng City
 insert into City (CityID, CityName)
-values  (0, N'An Giang'),
-        (1, N'Bà Rịa-Vũng Tàu'),
-        (2, N'Bắc Giang');
+values  (0, 'An Giang'),
+        (1, 'Bà Rịa-Vũng Tàu'),
+        (2, 'Bắc Giang');
 
 -- Chèn dữ liệu vào bảng Account
-insert into Account (UserID, PassWord, CreationDate, Location, Authority, Status)
+insert into Account (UserName, PassWord, CreationDate, Location, Authority, Status)
 values  ('abc', '123', '2023/12/18', 0, 'Admin', 1),
         ('def', '456', '2024/2/29', 2, 'Manager', 1),
         ('klm', '012', '2024/1/31', 0, 'Manager', 1),
@@ -162,7 +181,7 @@ values  ('abc', '123', '2023/12/18', 0, 'Admin', 1),
         ('nop', '345', '2023/6/12', 1, 'Customer', 1);
 
 -- Chèn dữ liệu vào bảng Branch
-insert into Branch (BranchID, BranchName, PhoneNumber, Email, UserID)
+insert into Branch (BranchID, BranchName, PhoneNumber, Email, UserName)
 values  (1, 'Chi nhánh 1', '8596342345', 'cn1@gmail.com', 'def'),
         (2, 'Chi nhánh 2', '3769228364', 'cn2@gmail.com', 'klm');
 
@@ -182,9 +201,16 @@ values  ('qwertyuiop', 1, 36, '2024/1/12'),
         ('yhnurldnvg', 2, 28, '2024/5/31');
 
 -- Chèn dữ liệu vào bảng Customer
-insert into Customer (CustomerName, UserID)
+insert into Customer (CustomerName, UserName)
 values  ('Lê Bá Tuân', 'ghi'),
         ('Nguyễn Thị Hạnh', 'nop');
+
+-- Chèn dữ liệu vào bảng Cart
+insert into Cart (ProductID, CustomerID, BranchID)
+values  ('asdfghjklo', 1000, 1),
+        ('zxcvbnmuty', 1000, 1),
+        ('qwertyuiop', 1001, 1),
+        ('yhnurldnvg', 1001, 2);
 
 -- Chèn dữ liệu vào bảng Voucher
 insert into Voucher (VoucherCode , Detail, Discount, PointChange)
@@ -198,21 +224,21 @@ values  ('qazwsxedcr', 1000),
         ('rfvtgbyhnu', 1001);       
 
 -- Chèn dữ liệu vào bảng Orders
-insert into Orders (CreationDate, Status, BranchID, CustomerID, VoucherCode)
-values  ('2024/1/23', 1, 1, 1000, 'qazwsxedcr'),
-        ('2024/4/2', 0, 2, 1000, null),
-        ('2024/5/17', 0, 1, 1000, 'rfvtgbyhnu'),
-        ('2023/2/28', 0, 2, 1001, null),
-        ('2024/4/1', 1, 2, 1001, 'rfvtgbyhnu');
+insert into Orders (CreationDate, Status, CustomerID, VoucherCode)
+values  ('2024/1/23', 1, 1000, 'qazwsxedcr'),
+        ('2024/4/2', 0, 1000, null),
+        ('2024/5/17', 0, 1000, 'rfvtgbyhnu'),
+        ('2023/2/28', 0, 1001, null),
+        ('2024/4/1', 1, 1001, 'rfvtgbyhnu');
 
 -- Chèn dữ liệu vào bảng OrderDetail
-insert into OrderDetail (ProductID, OrderID, Quantity)
-values  ('qwertyuiop', 100, 1),
-        ('asdfghjklo', 100, 2),
-        ('qwertyuiop', 101, 4),
-        ('qwertyuiop', 102, 1),
-        ('asdfghjklo', 102, 1),
-        ('asdfghjklo', 103, 1),
-        ('yhnurldnvg', 103, 1),
-        ('asdfghjklo', 104, 1),
-        ('yhnurldnvg', 104, 1);
+insert into OrderDetail (OrderID, ProductID, BranchID, Quantity)
+values  (100, 'qwertyuiop', 1, 1),
+        (100, 'asdfghjklo', 1, 2),
+        (101, 'qwertyuiop', 1, 4),
+        (102, 'qwertyuiop', 2, 1),
+        (102, 'asdfghjklo', 2, 1),
+        (103, 'asdfghjklo', 2, 1),
+        (103, 'yhnurldnvg', 2, 1),
+        (104, 'asdfghjklo', 1, 1),
+        (104, 'yhnurldnvg', 2, 1);

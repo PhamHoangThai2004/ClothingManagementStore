@@ -3,8 +3,8 @@ package model.entity;
 import java.sql.Date;
 
 public class Account {
-    private String userID;
-    private String passWord;
+    private String userName;
+    private String password;
     private Date creationDate;
     private City location;
     private String authority;
@@ -13,30 +13,30 @@ public class Account {
     public Account() {
     }
 
-    public Account(String userID, String passWord, Date creationDate, 
-            City location, String Authority, boolean status) {
-        this.userID = userID;
-        this.passWord = passWord;
+    public Account(String userName, String password, Date creationDate,
+            City location, String authority, boolean status) {
+        this.userName = userName;
+        this.password = password;
         this.creationDate = creationDate;
         this.location = location;
-        this.authority = Authority;
+        this.authority = authority;
         this.status = status;
     }
 
-    public String getUserID() {
-        return userID;
+    public String getUserName() {
+        return userName;
     }
 
-    public void setUserID(String userID) {
-        this.userID = userID;
+    public void setUserName(String userName) {
+        this.userName = userName;
     }
 
-    public String getPassWord() {
-        return passWord;
+    public String getPassword() {
+        return password;
     }
 
-    public void setPassWord(String passWord) {
-        this.passWord = passWord;
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public Date getCreationDate() {
@@ -59,8 +59,8 @@ public class Account {
         return authority;
     }
 
-    public void setAuthority(String Authority) {
-        this.authority = Authority;
+    public void setAuthority(String authority) {
+        this.authority = authority;
     }
 
     public boolean isStatus() {
@@ -73,8 +73,8 @@ public class Account {
 
     @Override
     public String toString() {
-        return "Account{" + "userID=" + userID + ", passWord=" + passWord +
-                ", creationDate=" + creationDate + ", location=" + location +
-                ", Authority=" + authority + ", status=" + status + '}';
+        return "Account{" + "userName=" + userName + ", password=" + password +
+                ", creationDate=" + creationDate + ", location=" + location + 
+                ", authority=" + authority + ", status=" + status + '}';
     }
 }
